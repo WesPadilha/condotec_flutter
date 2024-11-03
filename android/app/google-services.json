@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1054203624552",
+    "project_id": "condotecfirebase",
+    "storage_bucket": "condotecfirebase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1054203624552:android:282f591f001bb2d1990fdd",
+        "android_client_info": {
+          "package_name": "condotec.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxk52ny8yKxCK6a5CGlgm_VZGyygk9xuQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
