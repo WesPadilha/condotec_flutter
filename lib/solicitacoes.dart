@@ -137,49 +137,100 @@ class _SolicitacoesScreenState extends State<SolicitacoesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Solicitações'),
+        backgroundColor: const Color(0xFF003283), // Cor de fundo do header (azul)
+        foregroundColor: Colors.white, // Cor da escrita no header (branca)
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: _solicitacoes.length,
-              itemBuilder: (context, index) {
-                var solicitacao = _solicitacoes[index];
-                bool isAdmin = _solicitacoes[index]['userId'] != FirebaseAuth.instance.currentUser?.uid;
-
-                return ListTile(
-                  title: Text(solicitacao['titulo']),
-                  subtitle: solicitacao['resposta'] != null
-                      ? Text("Resposta: ${solicitacao['resposta']}")
-                      : Text(solicitacao['descricao']),
-                  trailing: isAdmin
-                      ? IconButton(
-                          icon: const Icon(Icons.message),
-                          onPressed: () => _responderChamado(solicitacao),
-                        )
-                      : Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit),
-                              onPressed: () => _editChamado(solicitacao),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () async {
-                                await FirebaseFirestore.instance
-                                    .collection('chamados')
-                                    .doc(solicitacao['id'])
-                                    .delete();
-                                setState(() {
-                                  _solicitacoes.removeWhere((item) => item['id'] == solicitacao['id']);
-                                });
-                              },
-                            ),
-                          ],
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/solicitacao.jpg'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: _isLoading
+              ? const CircularProgressIndicator()
+              : SingleChildScrollView(
+                  child: Container(
+                    width: 700,
+                    height: 500,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                );
-              },
-            ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Solicitações',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SingleChildScrollView(
+                          child: Column(
+                            children: List.generate(_solicitacoes.length, (index) {
+                              var solicitacao = _solicitacoes[index];
+                              bool isAdmin = _solicitacoes[index]['userId'] != FirebaseAuth.instance.currentUser?.uid;
+
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[200], // Cor de fundo das solicitações
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: ListTile(
+                                  title: Text(solicitacao['titulo']),
+                                  subtitle: solicitacao['resposta'] != null
+                                      ? Text("Resposta: ${solicitacao['resposta']}")
+                                      : Text(solicitacao['descricao']),
+                                  trailing: isAdmin
+                                      ? IconButton(
+                                          icon: const Icon(Icons.message),
+                                          onPressed: () => _responderChamado(solicitacao),
+                                        )
+                                      : Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              icon: const Icon(Icons.edit),
+                                              onPressed: () => _editChamado(solicitacao),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(Icons.delete),
+                                              onPressed: () async {
+                                                await FirebaseFirestore.instance
+                                                    .collection('chamados')
+                                                    .doc(solicitacao['id'])
+                                                    .delete();
+                                                setState(() {
+                                                  _solicitacoes.removeWhere((item) => item['id'] == solicitacao['id']);
+                                                });
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+        ),
+      ),
     );
   }
 

@@ -135,23 +135,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                 icon: Icons.assignment,
                                 route: '/solicitacoes',
                               ),
-                              if (!_isAdmin) ...[
+                              if (!_isAdmin)
                                 _buildMenuItem(
                                   title: 'Chamados', // Para usuários comuns
                                   icon: Icons.call,
                                   route: '/chamados',
                                 ),
-                              ],
                               _buildMenuItem(
                                 title: 'Vagas', // Para todos os usuários
                                 icon: Icons.business_center,
                                 route: '/vagas',
                               ),
-                              _buildMenuItem(
-                                title: 'Eventos',
-                                icon: Icons.event,
-                                route: _isAdmin ? '/eventos' : '',
-                              ),
+                              if (_isAdmin)
+                                _buildMenuItem(
+                                  title: 'Eventos',
+                                  icon: Icons.event,
+                                  route: '/eventos',
+                                ),
                             ],
                           ),
                       ],
