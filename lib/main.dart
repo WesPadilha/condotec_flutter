@@ -5,6 +5,9 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // Importando Firestore
 import 'firebase_options.dart';
 import 'signup.dart'; // Importa a tela de cadastro
 import 'home.dart'; // Importa a tela homeAdm
+import 'vagas.dart'; // Importa a tela de gerenciamento de vagas
+import 'chamados.dart'; // Importa a tela de chamados
+import 'solicitacoes.dart'; // Importa a tela de solicitações
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,11 +15,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Exemplo de chamada da função para criar um admin
-  //await createAdmin('admin2@gmail.com', '123456789', 'ADEMIRO', '1234567890');
+  // Criar administrador (temporário, remova após a criação)
+  //await createAdmin("adm@gmail.com", "123456", "Vanderlei", "123456789");
 
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -34,6 +38,9 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => const SignupScreen(), // Rota para a tela de cadastro
         '/home': (context) => const HomeScreen(), // Rota para a tela inicial
         '/login': (context) => const LoginScreen(), // Rota para a tela de login
+        '/vagas': (context) => const VagasScreen(), // Rota para a tela de gerenciamento de vagas
+        '/chamados': (context) => const ChamadosScreen(), // Rota para a tela de chamados
+        '/solicitacoes': (context) => const SolicitacoesScreen(),
       },
     );
   }
@@ -109,61 +116,48 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'CondoTec',
+                    'Login',
                     style: TextStyle(
-                      fontSize: 40,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   TextField(
                     controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'E-mail',
-                    ),
+                    decoration: const InputDecoration(labelText: 'Email'),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   TextField(
                     controller: _passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Senha',
-                    ),
                     obscureText: true,
+                    decoration: const InputDecoration(labelText: 'Password'),
                   ),
-                  const SizedBox(height: 20),
-                  if (_errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  if (_errorMessage != null)
                     Text(
                       _errorMessage!,
                       style: const TextStyle(color: Colors.red),
                     ),
-                    const SizedBox(height: 20),
-                  ],
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[200], // Azul mais fraco
-                      minimumSize: const Size(double.infinity, 50), // Botão mais largo
-                      textStyle: const TextStyle(color: Colors.white),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text('Entrar'),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text("Não possui uma conta? Então"),
+                  const SizedBox(height: 16),
+                  _isLoading
+                      ? const CircularProgressIndicator()
+                      : ElevatedButton(
+                          onPressed: _login,
+                          child: const Text('Login'),
+                        ),
+                  const SizedBox(height: 16),
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pushNamed('/signup');
                     },
-                    child: const Text(
-                      'Crie uma conta',
-                      style: TextStyle(color: Colors.black), // Letra escura
-                    ),
+                    child: const Text('Don\'t have an account? Sign up'),
                   ),
                 ],
               ),
@@ -175,25 +169,23 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
+// Função para criar administrador, sem exibição na tela
 Future<void> createAdmin(String email, String password, String name, String phone) async {
   try {
-    // Cria o usuário com o email e a senha
     UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
 
-    // Obter o ID do usuário recém-criado
     String uid = userCredential.user!.uid;
 
-    // Adiciona o admin ao Firestore
     await FirebaseFirestore.instance.collection('admins').doc(uid).set({
       'email': email,
       'uid': uid,
-      'name': name, // Nome do administrador
-      'phone': phone, // Telefone do administrador
-      'role': 'admin', // Identificação de ADM
-      'createdAt': Timestamp.now(), // Data de criação
+      'name': name,
+      'phone': phone,
+      'role': 'admin',
+      'createdAt': Timestamp.now(),
     });
 
     print('Admin created successfully: $uid');
