@@ -7,7 +7,8 @@ import 'signup.dart'; // Importa a tela de cadastro
 import 'home.dart'; // Importa a tela homeAdm
 import 'vagas.dart'; // Importa a tela de gerenciamento de vagas
 import 'chamados.dart'; // Importa a tela de chamados
-import 'solicitacoes.dart'; // Importa a tela de solicitações
+import 'solicitacoes.dart';
+import 'eventos.dart'; // Importa a tela de solicitações
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
         '/vagas': (context) => const VagasScreen(), // Rota para a tela de gerenciamento de vagas
         '/chamados': (context) => const ChamadosScreen(), // Rota para a tela de chamados
         '/solicitacoes': (context) => const SolicitacoesScreen(),
+        '/eventos': (context) => const EventosScreen(),
       },
     );
   }
