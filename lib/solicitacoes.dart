@@ -177,52 +177,54 @@ class _SolicitacoesScreenState extends State<SolicitacoesScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        SingleChildScrollView(
-                          child: Column(
-                            children: List.generate(_solicitacoes.length, (index) {
-                              var solicitacao = _solicitacoes[index];
-                              bool isAdmin = _solicitacoes[index]['userId'] != FirebaseAuth.instance.currentUser?.uid;
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: List.generate(_solicitacoes.length, (index) {
+                                var solicitacao = _solicitacoes[index];
+                                bool isAdmin = _solicitacoes[index]['userId'] != FirebaseAuth.instance.currentUser?.uid;
 
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[200], // Cor de fundo das solicitações
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: ListTile(
-                                  title: Text(solicitacao['titulo']),
-                                  subtitle: solicitacao['resposta'] != null
-                                      ? Text("Resposta: ${solicitacao['resposta']}")
-                                      : Text(solicitacao['descricao']),
-                                  trailing: isAdmin
-                                      ? IconButton(
-                                          icon: const Icon(Icons.message),
-                                          onPressed: () => _responderChamado(solicitacao),
-                                        )
-                                      : Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            IconButton(
-                                              icon: const Icon(Icons.edit),
-                                              onPressed: () => _editChamado(solicitacao),
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(Icons.delete),
-                                              onPressed: () async {
-                                                await FirebaseFirestore.instance
-                                                    .collection('chamados')
-                                                    .doc(solicitacao['id'])
-                                                    .delete();
-                                                setState(() {
-                                                  _solicitacoes.removeWhere((item) => item['id'] == solicitacao['id']);
-                                                });
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                ),
-                              );
-                            }),
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200], // Cor de fundo das solicitações
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(solicitacao['titulo']),
+                                    subtitle: solicitacao['resposta'] != null
+                                        ? Text("Resposta: ${solicitacao['resposta']}")
+                                        : Text(solicitacao['descricao']),
+                                    trailing: isAdmin
+                                        ? IconButton(
+                                            icon: const Icon(Icons.message),
+                                            onPressed: () => _responderChamado(solicitacao),
+                                          )
+                                        : Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(Icons.edit),
+                                                onPressed: () => _editChamado(solicitacao),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(Icons.delete),
+                                                onPressed: () async {
+                                                  await FirebaseFirestore.instance
+                                                      .collection('chamados')
+                                                      .doc(solicitacao['id'])
+                                                      .delete();
+                                                  setState(() {
+                                                    _solicitacoes.removeWhere((item) => item['id'] == solicitacao['id']);
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                  ),
+                                );
+                              }),
+                            ),
                           ),
                         ),
                       ],

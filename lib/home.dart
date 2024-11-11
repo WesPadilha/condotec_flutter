@@ -92,17 +92,79 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Stack(
               children: [
-                Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    Center(
-                      child: Text(
-                        'Bem-vindo${_isAdmin ? ', ADM' : ''}, $_userName!',
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                    ),
-                  ],
+                // Imagem de fundo
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/home.jpg',
+                    fit: BoxFit.cover,
+                  ),
                 ),
+                SingleChildScrollView( // Adiciona o scroll ao conteúdo
+                  padding: const EdgeInsets.only(left: 200), // Deixa espaço para o menu
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 50), // Ajusta o espaço no topo para o texto de boas-vindas
+                      Center(
+                        child: Container(
+                          width: 900,
+                          height: 1000,
+                          decoration: BoxDecoration(
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black45,
+                                blurRadius: 10,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                            color: Colors.white, // Fundo branco para o container
+                          ),
+                          padding: const EdgeInsets.all(40), // Adiciona padding de 40px para o conteúdo
+                          child: Column(
+                            children: [
+                              // Texto "Bem-vindo ADM" antes das imagens
+                              Text(
+                                'Bem-vindo${_isAdmin ? ', ADM' : ''} $_userName!',
+                                style: const TextStyle(
+                                  fontSize: 30,
+                                  color: Colors.black, // Texto em preto
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset('assets/imagem1.jpg', width: 405, height: 500), // Substitua com suas imagens
+                                  const SizedBox(width: 8), // Diminuindo a distância entre as imagens
+                                  Image.asset('assets/imagem2.jpg', width: 400, height: 300), // Substitua com suas imagens
+                                ],
+                              ),
+                              const SizedBox(height: 10), // Ajusta o espaço entre as imagens e os textos abaixo
+                              const Text(
+                                'Bem-vindo ao site de condomínios!',
+                                style: TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black, // Texto em preto
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              const Text(
+                                'Este site permite que você faça solicitações ao síndico, visualize as solicitações existentes e adicione vagas para seu carro no estacionamento. Aproveite a experiência e se precisar de alguma coisa, não hesite em nos contatar.',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black, // Texto em preto
+                                ),
+                                textAlign: TextAlign.justify, // Justificando o texto
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+                // Menu fixo na lateral
                 Positioned(
                   top: 0,
                   left: 0,

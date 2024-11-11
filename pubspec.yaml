@@ -67,6 +67,11 @@ flutter:
     - assets/wallpaperHome.jpg
     - assets/chamado.jpg
     - assets/solicitacao.jpg
+    - assets/vagas.jpg
+    - assets/evento.jpg
+    - assets/home.jpg
+    - assets/imagem1.jpg
+    - assets/imagem2.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -17,11 +17,10 @@ void main() async {
   );
 
   // Criar administrador (temporário, remova após a criação)
-  //await createAdmin("adm@gmail.com", "123456", "Vanderlei", "123456789");
+  //await createAdmin("wes@gmail.com", "123456789", "Wesley", "123456789");
 
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -60,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
+  bool _obscurePassword = true; // Variável para controlar a visibilidade da senha
 
   Future<void> _login() async {
     setState(() {
@@ -76,10 +76,22 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         Navigator.of(context).pushReplacementNamed('/home');
       }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        String errorMessage = 'senha ou e-mail incorreto!'; // Mensagem padrão para erro desconhecido
+        if (e.code == 'user-not-found') {
+          errorMessage = 'E-mail não encontrado. Verifique seu e-mail e tente novamente.';
+        } else if (e.code == 'wrong-password') {
+          errorMessage = 'Senha incorreta. Verifique sua senha e tente novamente.';
+        }
+        setState(() {
+          _errorMessage = errorMessage;
+        });
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = e.toString();
+          _errorMessage = 'Ocorreu um erro inesperado: $e';
         });
       }
     } finally {
@@ -138,8 +150,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Password'),
+                    obscureText: _obscurePassword, // Usando a variável para controlar a visibilidade
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.lock // Cadeado fechado quando a senha está oculta
+                              : Icons.lock_open, // Cadeado aberto quando a senha está visível
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword; // Alterna a visibilidade da senha
+                          });
+                        },
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   if (_errorMessage != null)
@@ -152,14 +178,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? const CircularProgressIndicator()
                       : ElevatedButton(
                           onPressed: _login,
-                          child: const Text('Login'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF003283),
+                          ),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                              color: Colors.white, // Cor do texto dentro do botão
+                            ),
+                          ),
                         ),
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).pushNamed('/signup');
                     },
-                    child: const Text('Don\'t have an account? Sign up'),
+                    child: const Text('Criar Conta'),
                   ),
                 ],
               ),

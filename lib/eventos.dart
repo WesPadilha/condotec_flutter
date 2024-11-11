@@ -86,26 +86,69 @@ class _EventosScreenState extends State<EventosScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Criar Evento'),
+        backgroundColor: const Color(0xFF003283),
+        foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _eventController,
-              decoration: const InputDecoration(
-                labelText: 'Escreva o evento',
-              ),
-              maxLines: 5,
-            ),
-            const SizedBox(height: 20),
-            _isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: postEvent,
-                    child: const Text('Publicar Evento'),
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/evento.jpg'), // Substitua pelo caminho correto da imagem de fundo
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Container(
+              width: 300,
+              height: 400,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-          ],
+                ],
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Escreva o evento',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: _eventController,
+                    decoration: const InputDecoration(
+                      labelText: 'Evento',
+                    ),
+                    maxLines: 5,
+                  ),
+                  const SizedBox(height: 20),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                        onPressed: postEvent,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF003283),
+                        ),
+                        child: const Text(
+                          'Publicar Evento',
+                          style: TextStyle(color: Colors.white),  // Definindo a cor do texto como branco
+                        ),
+                      ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

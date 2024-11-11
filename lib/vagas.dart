@@ -161,76 +161,98 @@ class _VagasScreenState extends State<VagasScreen> {
       appBar: AppBar(
         title: const Text('Vagas'),
         backgroundColor: const Color(0xFF003283),
+        foregroundColor: Colors.white,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: _vagas.isEmpty
-                      ? const Center(child: Text("Nenhuma vaga encontrada"))
-                      : ListView.builder(
-                          itemCount: _vagas.length,
-                          itemBuilder: (context, index) {
-                            final vaga = _vagas[index];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                              child: ListTile(
-                                title: Text(vaga['titulo'] ?? 'Título não disponível'),
-                                subtitle: Text(vaga['descricao'] ?? 'Descrição não disponível'),
-                                trailing: !_isAdmin
-                                    ? Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
-                                            icon: const Icon(Icons.edit, color: Colors.blue),
-                                            onPressed: () => _showAddOrEditVagaDialog(
-                                              id: vaga['id'],
-                                              initialTitulo: vaga['titulo'],
-                                              initialDescricao: vaga['descricao'],
-                                            ),
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(Icons.delete, color: Colors.red),
-                                            onPressed: () => _removeVaga(vaga['id']),
-                                          ),
-                                        ],
-                                      )
-                                    : null,
-                                onTap: () => _showVagaDetails(vaga),
-                              ),
-                            );
-                          },
+      body: Container(
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/vagas.jpg'), // Substitua pelo caminho correto da imagem de fundo
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: _isLoading
+              ? const CircularProgressIndicator()
+              : SingleChildScrollView(
+                  child: Container(
+                    width: 700,
+                    height: 500,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
-                ),
-                if (!_isAdmin)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ElevatedButton(
-                      onPressed: () => _showAddOrEditVagaDialog(),
-                      child: const Text("Adicionar Vaga"),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Vagas',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: List.generate(_vagas.length, (index) {
+                                var vaga = _vagas[index];
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200], // Cor de fundo das vagas
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(vaga['titulo']),
+                                    subtitle: Text(vaga['descricao']),
+                                    trailing: !_isAdmin
+                                        ? Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                                onPressed: () => _showAddOrEditVagaDialog(
+                                                  id: vaga['id'],
+                                                  initialTitulo: vaga['titulo'],
+                                                  initialDescricao: vaga['descricao'],
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(Icons.delete, color: Colors.red),
+                                                onPressed: () => _removeVaga(vaga['id']),
+                                              ),
+                                            ],
+                                          )
+                                        : null,
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
+                        ),
+                        if (!_isAdmin)
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: ElevatedButton(
+                              onPressed: () => _showAddOrEditVagaDialog(),
+                              child: const Text("Adicionar Vaga"),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-              ],
-            ),
-    );
-  }
-
-  void _showVagaDetails(Map<String, dynamic> vaga) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(vaga['titulo'] ?? 'Detalhes da Vaga'),
-          content: Text(vaga['descricao'] ?? 'Descrição não disponível'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Fechar"),
-            ),
-          ],
-        );
-      },
+                ),
+        ),
+      ),
     );
   }
 }

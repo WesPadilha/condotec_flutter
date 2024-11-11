@@ -20,6 +20,10 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // Variáveis para controlar a visibilidade das senhas
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
+
   Future<void> _signup() async {
     setState(() {
       _isLoading = true;
@@ -118,18 +122,42 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 20),
                   TextField(
                     controller: _passwordController,
-                    decoration: const InputDecoration(
+                    obscureText: !_isPasswordVisible, // Controla a visibilidade da senha
+                    decoration: InputDecoration(
                       labelText: 'Senha',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
                     ),
-                    obscureText: true,
                   ),
                   const SizedBox(height: 20),
                   TextField(
                     controller: _confirmPasswordController,
-                    decoration: const InputDecoration(
+                    obscureText: !_isConfirmPasswordVisible, // Controla a visibilidade da confirmação da senha
+                    decoration: InputDecoration(
                       labelText: 'Confirmar Senha',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isConfirmPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                          });
+                        },
+                      ),
                     ),
-                    obscureText: true,
                   ),
                   const SizedBox(height: 20),
                   TextField(
@@ -172,9 +200,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   ElevatedButton(
                     onPressed: _isLoading ? null : _signup,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[200], // Azul mais fraco
+                      backgroundColor: const Color(0xFF003283), // Azul escuro
                       minimumSize: const Size(double.infinity, 50), // Botão mais largo
-                      textStyle: const TextStyle(color: Colors.white),
+                      foregroundColor: Colors.white, // Garante que o texto do botão seja branco
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator()
