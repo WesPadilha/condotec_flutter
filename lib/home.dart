@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -181,33 +182,110 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                               const SizedBox(height: 20), 
-                              // Card do clima
-                              Container(
-                                padding: const EdgeInsets.all(20),
-                                color: const Color.fromARGB(255, 255, 255, 255),
-                                child: Column(
-                                  children: [
-                                    const Text(
-                                      'Clima de hoje em Guarapuava :)',
-                                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  // Previsão do tempo
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(20),
+                                      color: Colors.white,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Clima de hoje em Guarapuava :)',
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          _weatherData != null
+                                              ? Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        const Icon(Icons.thermostat, color: Colors.blue),
+                                                        const SizedBox(width: 10),
+                                                        Text(
+                                                          'Temperatura: ${_weatherData!['main']['temp']}°C',
+                                                          style: const TextStyle(fontSize: 18),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    Row(
+                                                      children: [
+                                                        const Icon(Icons.cloud, color: Colors.grey),
+                                                        const SizedBox(width: 10),
+                                                        Text(
+                                                          'Condição: ${_weatherData!['weather'][0]['description']}',
+                                                          style: const TextStyle(fontSize: 18),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                )
+                                              : const CircularProgressIndicator(),
+                                        ],
+                                      ),
                                     ),
-                                    const SizedBox(height: 10),
-                                    _weatherData != null
-                                        ? Column(
-                                            children: [
+                                  ),
+                                  const SizedBox(width: 20),
+                                  // Contatos
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Contatos',
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: const [
+                                              Icon(FontAwesomeIcons.whatsapp, color: Colors.green),
+                                              SizedBox(width: 10),
                                               Text(
-                                                'Temperatura: ${_weatherData!['main']['temp']}°C',
-                                                style: const TextStyle(fontSize: 18),
-                                              ),
-                                              Text(
-                                                'Condição: ${_weatherData!['weather'][0]['description']}',
-                                                style: const TextStyle(fontSize: 18),
+                                                '+55 11 98765-4321',
+                                                style: TextStyle(fontSize: 18),
                                               ),
                                             ],
-                                          )
-                                        : const CircularProgressIndicator(),
-                                  ],
-                                ),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: const [
+                                              Icon(Icons.email, color: Colors.red),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                'contato@condotec.com',
+                                                style: TextStyle(fontSize: 18),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: const [
+                                              Icon(Icons.phone, color: Colors.blue),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                '(11) 1234-5678',
+                                                style: TextStyle(fontSize: 18),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
