@@ -1,6 +1,8 @@
+import 'package:condotec/weather_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,13 +16,23 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   bool _isAdmin = false;
   bool _isMenuExpanded = false; // Controle de expansão do menu
-  final Set<String> _hoveredItems = {}; // Controle para hover de itens
-  final Map<String, double> _itemScales = {}; // Mapeia cada item com seu tamanho individual
+  final WeatherService _weatherService = WeatherService();
+  Map<String, dynamic>? _weatherData;
+  Set<String> _hoveredItems = {}; // Armazena os itens que estão sendo "hovered"
+  Map<String, double> _itemScales = {}; // Armazena o tamanho de cada item
 
   @override
   void initState() {
     super.initState();
     _fetchUserName();
+    _fetchWeather();
+  }
+
+  Future<void> _fetchWeather() async {
+    final weather = await _weatherService.getWeather('São Paulo');
+    setState(() {
+      _weatherData = weather;
+    });
   }
 
   Future<void> _fetchUserName() async {
@@ -92,18 +104,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Stack(
               children: [
-                // Imagem de fundo
                 Positioned.fill(
                   child: Image.asset(
                     'assets/home.jpg',
                     fit: BoxFit.cover,
                   ),
                 ),
-                SingleChildScrollView( // Adiciona o scroll ao conteúdo
-                  padding: const EdgeInsets.only(left: 200), // Deixa espaço para o menu
+                SingleChildScrollView(
+                  padding: EdgeInsets.only(left: _isMenuExpanded ? 200 : 50),
                   child: Column(
                     children: [
-                      const SizedBox(height: 50), // Ajusta o espaço no topo para o texto de boas-vindas
+                      const SizedBox(height: 50),
                       Center(
                         child: Container(
                           width: 900,
@@ -116,74 +127,113 @@ class _HomeScreenState extends State<HomeScreen> {
                                 offset: Offset(0, 4),
                               ),
                             ],
-                            color: Colors.white, // Fundo branco para o container
+                            color: Colors.white,
                           ),
-                          padding: const EdgeInsets.all(40), // Adiciona padding de 40px para o conteúdo
+                          padding: const EdgeInsets.all(40),
                           child: Column(
                             children: [
-                              // Texto "Bem-vindo ADM" antes das imagens
                               Text(
                                 'Bem-vindo${_isAdmin ? ', ADM' : ''} $_userName!',
                                 style: const TextStyle(
                                   fontSize: 30,
-                                  color: Colors.black, // Texto em preto
+                                  color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                              const SizedBox(height: 20),
+                              CarouselSlider(
+                                options: CarouselOptions(
+                                  height: 400.0,
+                                  autoPlay: true,
+                                  enlargeCenterPage: true,
+                                  enableInfiniteScroll: true,
+                                  autoPlayInterval: Duration(seconds: 3),
+                                  autoPlayAnimationDuration: Duration(milliseconds: 800),
+                                ),
+                                items: [
+                                  'assets/imagem1.jpg',
+                                  'assets/imagem2.jpg',
+                                  'assets/imagem3.jpeg',
+                                ].map((item) => Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4))],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset(item, fit: BoxFit.cover, width: double.infinity),
+                                  ),
+                                )).toList(),
+                              ),
+                              const SizedBox(height: 20),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisAlignment: _isAdmin ? MainAxisAlignment.center : MainAxisAlignment.start, // Centraliza os cards quando for ADM
                                 children: [
-                                  Image.asset('assets/imagem1.jpg', width: 405, height: 500), // Substitua com suas imagens
-                                  const SizedBox(width: 8), // Diminuindo a distância entre as imagens
-                                  Image.asset('assets/imagem2.jpg', width: 400, height: 300), // Substitua com suas imagens
+                                  if (_isAdmin) ...[ // Para o Admin, exibe "Solicitações" e "Vagas" lado a lado
+                                    _buildCard('Solicitações', Icons.assignment, '/solicitacoes'),
+                                    const SizedBox(width: 10), // Espaço pequeno entre os cards
+                                    _buildCard('Vagas', Icons.business_center, '/vagas'),
+                                  ] else ...[ // Para os outros usuários, mantém o layout como estava
+                                    _buildCard('Solicitações', Icons.assignment, '/solicitacoes'),
+                                    _buildCard('Chamados', Icons.call, '/chamados'),
+                                    _buildCard('Vagas', Icons.business_center, '/vagas'),
+                                  ]
                                 ],
                               ),
-                              const SizedBox(height: 10), // Ajusta o espaço entre as imagens e os textos abaixo
-                              const Text(
-                                'Bem-vindo ao site de condomínios!',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black, // Texto em preto
+                              const SizedBox(height: 20), 
+                              // Card do clima
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                color: const Color.fromARGB(255, 255, 255, 255),
+                                child: Column(
+                                  children: [
+                                    const Text(
+                                      'Clima de hoje em Guarapuava :)',
+                                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    _weatherData != null
+                                        ? Column(
+                                            children: [
+                                              Text(
+                                                'Temperatura: ${_weatherData!['main']['temp']}°C',
+                                                style: const TextStyle(fontSize: 18),
+                                              ),
+                                              Text(
+                                                'Condição: ${_weatherData!['weather'][0]['description']}',
+                                                style: const TextStyle(fontSize: 18),
+                                              ),
+                                            ],
+                                          )
+                                        : const CircularProgressIndicator(),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(height: 5),
-                              const Text(
-                                'Este site permite que você faça solicitações ao síndico, visualize as solicitações existentes e adicione vagas para seu carro no estacionamento. Aproveite a experiência e se precisar de alguma coisa, não hesite em nos contatar.',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black, // Texto em preto
-                                ),
-                                textAlign: TextAlign.justify, // Justificando o texto
                               ),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
-                // Menu fixo na lateral
                 Positioned(
                   top: 0,
                   left: 0,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    width: _isMenuExpanded ? screenWidth * 0.2 : screenWidth * 0.05, // Menu fechado mais estreito
+                    width: _isMenuExpanded ? screenWidth * 0.2 : screenWidth * 0.05,
                     height: MediaQuery.of(context).size.height,
                     decoration: const BoxDecoration(
                       color: Color(0xFF003283),
-                      borderRadius: BorderRadius.all(Radius.circular(0)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.menu, color: Colors.white),
-                          onPressed: _toggleMenu, // Ação de expandir/contrair o menu
+                          onPressed: _toggleMenu,
                         ),
-                        if (_isMenuExpanded) // Mostrar o conteúdo expandido quando o menu estiver aberto
+                        if (_isMenuExpanded)
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -193,18 +243,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                 route: '/home',
                               ),
                               _buildMenuItem(
-                                title: 'Solicitações', // Para todos os usuários
+                                title: 'Solicitações',
                                 icon: Icons.assignment,
                                 route: '/solicitacoes',
                               ),
                               if (!_isAdmin)
                                 _buildMenuItem(
-                                  title: 'Chamados', // Para usuários comuns
+                                  title: 'Chamados',
                                   icon: Icons.call,
                                   route: '/chamados',
                                 ),
                               _buildMenuItem(
-                                title: 'Vagas', // Para todos os usuários
+                                title: 'Vagas',
                                 icon: Icons.business_center,
                                 route: '/vagas',
                               ),
@@ -225,6 +275,49 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildCard(String title, IconData icon, String route) {
+    return Card(
+      elevation: 8,
+      shadowColor: Colors.black26,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.of(context).pushNamed(route);
+        },
+        child: Container(
+          width: 250,
+          height: 150,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 4)),
+            ],
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 40, color: Color(0xFF003283)),
+                const SizedBox(height: 10),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF003283),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildMenuItem({required String title, required IconData icon, required String route}) {
     return MouseRegion(
       onEnter: (_) {
@@ -239,23 +332,24 @@ class _HomeScreenState extends State<HomeScreen> {
           _itemScales[title] = 1.0; // Retorna ao tamanho normal
         });
       },
-      child: GestureDetector(
-        onTap: () {
-          if (route.isNotEmpty) {
+      child: AnimatedScale(
+        scale: _itemScales[title] ?? 1.0,
+        duration: const Duration(milliseconds: 200),
+        child: InkWell(
+          onTap: () {
             Navigator.of(context).pushNamed(route);
-          }
-        },
-        child: AnimatedScale(
-          duration: const Duration(milliseconds: 200),
-          scale: _itemScales[title] ?? 1.0, // Aplica a escala individual do item
-          child: ListTile(
-            leading: Icon(icon, color: Colors.white),
-            title: Text(
-              title,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: _hoveredItems.contains(title) ? FontWeight.bold : FontWeight.normal,
-              ),
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Icon(icon, color: Colors.white, size: 24),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ],
             ),
           ),
         ),

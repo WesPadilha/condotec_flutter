@@ -17,7 +17,7 @@ void main() async {
   );
 
   // Criar administrador (temporário, remova após a criação)
-  //await createAdmin("wes@gmail.com", "123456789", "Wesley", "123456789");
+  await createAdmin("izaq@gmail.com", "123456789", "Izaque", "123456789");
 
   runApp(const MyApp());
 }
